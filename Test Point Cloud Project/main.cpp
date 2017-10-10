@@ -54,17 +54,19 @@ int main(int argc, char* argv[])
 {
     vector<vector<double>> pointclouds1 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test1.pts");
     vector<vector<double>> pointclouds2 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test2.pts");
-    //vector<vector<double>> pointclouds3 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/000020.pts");
+    vector<vector<double>> pointclouds3 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test3.pts");
+    //vector<vector<double>> pointclouds4 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/000020.pts");
+    
     printVector(pointclouds1);
     cout << "========" << endl;
-    //printVector(pointclouds2);
+    printVector(pointclouds2);
     cout << "========" << endl;
-    //printVector(pointclouds3);
-    //cout << "========" << endl;
+    printVector(pointclouds3);
+    cout << "========" << endl;
     
     time_t start,stop;
     start = time(NULL);
-    REAL theta = mylpsolve(pointclouds1.size(), pointclouds2.size(), pointclouds1, pointclouds2, 1);
+    REAL theta = mylpsolve(pointclouds1.size(), pointclouds3.size(), pointclouds1, pointclouds3, 1);
     stop = time(NULL);
     cout << "theta: " << theta << " ------- time usage: "<< stop-start <<endl;
    
@@ -264,8 +266,8 @@ REAL calculateRotation(int i, int j, int k, int l, const vector<vector<double>> 
     double distance1 = sqrt(diffX1 * diffX1 + diffY1 * diffY1 + diffZ1 * diffZ1);
     double distance2 = sqrt(diffX2 * diffX2 + diffY2 * diffY2 + diffZ2 * diffZ2);
     
-    REAL result = distance1 >= distance2 ? distance1 : distance2;
-    return result == 0.0 ? result : 0.000001 ;
+    REAL result = fabs(distance1 - distance2);
+    return result != 0.0 ? result : 0.000001 ;
 }
 
 int demo( void )
