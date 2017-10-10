@@ -6,39 +6,13 @@
 //  Copyright © 2017年 李喆. All rights reserved.
 //
 
-//#include <iostream>
-//#include <string>
-//using namespace std;
-//
-//int main(int argc, const char * argv[]) {
-//    // insert code here...
-//    std::string s;
-//    std::cin >> s;
-//    std::cout << "Hello, " << s << "!\n";
-//    return 0;
-//}
-
-//------------------------------------------------------------------------------
-//    Copyright (c) 2012 eryar All Rights Reserved.
-//
-//        File    : Main.cpp
-//        Author  : eryar@163.com
-//        Date    : 2012-9-9 17:11
-//        Version : 0.1v
-//
-//    Description : lpsolve test program.
-//
-//==============================================================================
+#include "lp_lib.h"
 #include <iostream>
 #include "stdio.h"
 #include <fstream>
 #include <vector>
 #include <math.h>
 using namespace std;
-
-#include "lp_lib.h"
-
-//#pragma comment(lib, "lpsolve55.lib")
 
 int demo(void);
 void readPtsFile(string filename);
@@ -49,29 +23,37 @@ vector<vector<double>> creatPointCloudArrayFromFile(string filename);
 void printVector(vector<vector<double>> pointclouds);
 REAL calculateRotation(int i, int j, int k, int l, const vector<vector<double>> &pointclouds1, const vector<vector<double>> &pointclouds2);
 REAL mylpsolve(int m ,int n, vector<vector<double>> &pointclouds1, vector<vector<double>> &pointclouds2, double threshold);
+void testLP();
 
 int main(int argc, char* argv[])
 {
-    vector<vector<double>> pointclouds1 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test1.pts");
-    vector<vector<double>> pointclouds2 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test2.pts");
-    vector<vector<double>> pointclouds3 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test3.pts");
-    //vector<vector<double>> pointclouds4 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/000020.pts");
-    
+    vector<vector<double>> pointclouds1 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test1.pts"); // cube with length 1 in quadrant 1
+    vector<vector<double>> pointclouds2 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test2.pts"); // cube with length 1 in quadrant 7
+    vector<vector<double>> pointclouds3 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test3.pts"); // cube with length 2 in quadrant 1
+    vector<vector<double>> pointclouds4 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test4.pts"); // 2D rectangle 2*4
+    vector<vector<double>> pointclouds5 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test5.pts"); // 2D rectangle 2*2
+    //vector<vector<double>> pointcloudsX = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/000020.pts");
+
     printVector(pointclouds1);
     cout << "========" << endl;
     printVector(pointclouds2);
     cout << "========" << endl;
     printVector(pointclouds3);
     cout << "========" << endl;
-    
+    printVector(pointclouds4);
+    cout << "========" << endl;
+    printVector(pointclouds5);
+    cout << "========" << endl;
+
     time_t start,stop;
     start = time(NULL);
-    REAL theta = mylpsolve(pointclouds1.size(), pointclouds3.size(), pointclouds1, pointclouds3, 1);
+    REAL theta = mylpsolve(pointclouds4.size(), pointclouds5.size(), pointclouds4, pointclouds5, 1);
     stop = time(NULL);
     cout << "theta: " << theta << " ------- time usage: "<< stop-start <<endl;
    
 // ========================================
     
+//    testLP();
 //    return demo();
 
 // ========================================
@@ -148,8 +130,8 @@ REAL mylpsolve(int m ,int n, vector<vector<double>> &pointclouds1, vector<vector
     // the official site says that declare the objective function than constrain is much better
     if (0 == ret) {
         // Row mode should be truned off again when done building the model.
-        set_add_rowmode(lp, FALSE);
-        
+
+        set_minim(lp);
         int colno[1] = {m*n+1};
         REAL row[1] = {1.0};
         
@@ -204,31 +186,51 @@ REAL mylpsolve(int m ,int n, vector<vector<double>> &pointclouds1, vector<vector
     if (0 == ret) {
         // the colnoXY[0] colnoXY[1] and sparserowXY[2] will be change
         REAL sparserowXY[3] = {1.0,1.0,1.0};
-        int colnoXY[3] = {1,1,m*n+1};
+        int colnoXY[3] = {3,1,m*n+1};
+        REAL denominator = 1.0;
         // constructs the row like: Sik + Sjl - theta/distortion <= 1
         for (int i1 = 0; i1 < m; i1++){
             for (int j1 = 0; j1 < n; j1++){
-                for (int i2 = 0; i2 < m; i2 ++){
+                //colnoXY[0] = i1 * n + j1 + 1; // assigne value each time in inner loop or it will be changed by add_constraint
+                for (int i2 = 0; i2 < m; i2++){
                     for (int j2 = 0; j2 < n; j2++){
-                        colnoXY[0] = i1*n + j1 + 1;
-                        colnoXY[1] = i2*n + j2 + 1;
-                        sparserowXY[2] = -1 / calculateRotation(i1, i2, j1, j2, pointclouds1, pointclouds2);
-                        if (!add_constraintex(lp, 3, sparserowXY, colnoXY, LE, 1.0)) {
-                            ret = 3;
-                            cout << "add constaint fail in step 3" << endl;
+                        // 注意，如果colnoXY[0] 和colnoXY[1] 里面出现同样的,即都是一个yimisi，不会累加，而是取最后一个的值！！！！！！！
+                        if (i1 == i2 && j1 == j2){
+                            continue;
+                        } else {
+                            denominator = calculateRotation(i1, i2, j1, j2, pointclouds1, pointclouds2);
+                            if (denominator == 0){
+                                continue;
+                            }
+                            colnoXY[0] = i1*n + j1 + 1;
+                            colnoXY[1] = i2*n + j2 + 1;
+                            colnoXY[2] = m*n+1;
+                            sparserowXY[0] = 1;
+                            sparserowXY[2] = 1;
+                            sparserowXY[2] = -1.0 / denominator;
+                            
+//                            cout << colnoXY[0] << " " << colnoXY[1] << " " << colnoXY[2] << " " << sparserowXY[0] << " " << sparserowXY[1] << " " << sparserowXY[2] << endl;
+                            
+                            // this will change colnoXY !!!!
+                            if (!add_constraintex(lp, 3, sparserowXY, colnoXY, LE, 1.0)) {
+                                ret = 3;
+                                cout << "add constaint fail in step 3" << endl;
+                            }
                         }
-                       // cout << colnoXY[0] << " " << colnoXY[1] << " " << sparserowXY[2] << endl;
+//                        cout << "  after:  " << colnoXY[0] << " " << colnoXY[1] << " " << colnoXY[2] << " " << sparserowXY[0] << " " << sparserowXY[1] << " "<< sparserowXY[2] << endl;
                     }
                 }
             }
         }
     }
     
+    cout << "===========" << endl;
     
     // A solution is calculated, now lets get some results.
     if (0 == ret)
     {
-        ret = solve(lp);
+        set_add_rowmode(lp, FALSE);
+        ret = solve(lp); // will change the coefficient
         
         cout << "ret: " << ret << endl;
         
@@ -236,6 +238,7 @@ REAL mylpsolve(int m ,int n, vector<vector<double>> &pointclouds1, vector<vector
         thetaResult = get_objective(lp);
         
         //cout<<"Objective value: "<< thetaResult <<endl;
+        cout << "=======variables========" << endl;
         
         REAL * variables = new REAL[m*n+1];
         get_variables(lp, variables);
@@ -243,6 +246,30 @@ REAL mylpsolve(int m ,int n, vector<vector<double>> &pointclouds1, vector<vector
         {
             cout << variables[i] <<endl;
         }
+        
+        cout << "===============" << endl;
+        cout << "rows: " << get_Nrows(lp) << "   columns: "  << get_Ncolumns(lp) << endl;
+        
+//        REAL temp[4113]; // 从1开始，0是objective 所以是列数+1
+//        get_row(lp, 66, temp); // 大于0 的都获取不到
+//        for (int i = 1; i < 66; i++){
+//            cout << temp[i] << endl;
+//        }
+        
+//        REAL temp[4113]; // 从1开始，0是objective 所以是行数+1
+//        get_column(lp, 1, temp); // 大于0 的都获取不到
+//        for (int i = 1; i < 200; i++){
+//            cout << temp[i] << endl;
+//        }
+        
+        // binary check -> OK
+//        cout << "==============" << endl;
+//        bool flag1;
+//        for (int i = 0; i < 65; i++){
+//            flag1 = is_binary(lp, i+1);
+//            cout << "variable" << i+1 << "  binary?  " << flag1 << endl;
+//        }
+
     }
     
     // Clean up such that all used memory by lpsolve is freed.
@@ -254,7 +281,7 @@ REAL mylpsolve(int m ,int n, vector<vector<double>> &pointclouds1, vector<vector
     return thetaResult;
 }
 
-REAL calculateRotation(int i, int j, int k, int l, const vector<vector<double>> &pointclouds1, const vector<vector<double>> &pointclouds2){
+REAL calculateRotation(const int i, const int j, const int k, const int l, const vector<vector<double>> &pointclouds1, const vector<vector<double>> &pointclouds2){
     
     double diffX1 = fabs(pointclouds1[i][0] - pointclouds1[j][0]);
     double diffY1 = fabs(pointclouds1[i][1] - pointclouds1[j][1]);
@@ -267,8 +294,22 @@ REAL calculateRotation(int i, int j, int k, int l, const vector<vector<double>> 
     double distance2 = sqrt(diffX2 * diffX2 + diffY2 * diffY2 + diffZ2 * diffZ2);
     
     REAL result = fabs(distance1 - distance2);
-    return result != 0.0 ? result : 0.000001 ;
+    //cout << "distance: " << result << " ------- distance1 " << distance1 << " --------  distance2 " << distance2 <<endl;
+    return result;
 }
+
+void testLP(){
+    lprec* lp;
+    lp = make_lp(0, 2);
+    int colno[2] = {1, 1};
+    REAL sparserow[2] = {1.0, 2.0};
+    add_constraintex(lp, 2, sparserow, colno, LE, 5.0);
+    
+    REAL temp[3];
+    get_row(lp, 1, temp);
+    cout << temp[0] << " " << temp[1] << " " << temp[2] << endl;
+}
+
 
 int demo( void )
 {
@@ -412,7 +453,7 @@ int demo( void )
         write_LP(lp, stdout);
         
         // I only want to see important messages on screen while solving.
-        set_verbose(lp, IMPORTANT);
+        //set_verbose(lp, IMPORTANT);
         
         // Now let lpsolve calculate a solution.
         ret = solve(lp);
@@ -464,6 +505,7 @@ int demo( void )
     return ret;
     
 }
+
 
 void readPtsFile(string filename){
     ifstream infile;
