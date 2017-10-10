@@ -7,10 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD7143B81F8A192700A2C647 /* liblpsolve55.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7143B71F8A192700A2C647 /* liblpsolve55.a */; };
+		AD7143C01F8A1AB600A2C647 /* lp_SOS.h in Headers */ = {isa = PBXBuildFile; fileRef = AD7143B91F8A1AB400A2C647 /* lp_SOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AD7143C11F8A1AB600A2C647 /* lp_mipbb.h in Headers */ = {isa = PBXBuildFile; fileRef = AD7143BA1F8A1AB400A2C647 /* lp_mipbb.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AD7143C21F8A1AB600A2C647 /* lp_lib.h in Headers */ = {isa = PBXBuildFile; fileRef = AD7143BB1F8A1AB500A2C647 /* lp_lib.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AD7143C31F8A1AB600A2C647 /* lp_Hash.h in Headers */ = {isa = PBXBuildFile; fileRef = AD7143BC1F8A1AB500A2C647 /* lp_Hash.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AD7143C41F8A1AB600A2C647 /* lp_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = AD7143BD1F8A1AB500A2C647 /* lp_utils.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AD7143C51F8A1AB600A2C647 /* lp_types.h in Headers */ = {isa = PBXBuildFile; fileRef = AD7143BE1F8A1AB500A2C647 /* lp_types.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AD7143C61F8A1AB600A2C647 /* lp_matrix.h in Headers */ = {isa = PBXBuildFile; fileRef = AD7143BF1F8A1AB500A2C647 /* lp_matrix.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ADF37F831F6EB2C2003C3714 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADF37F821F6EB2C2003C3714 /* main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		AD7143C71F8A1D0600A2C647 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		ADF37F7D1F6EB2C2003C3714 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -23,6 +40,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AD7143B71F8A192700A2C647 /* liblpsolve55.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblpsolve55.a; path = ../../Downloads/lp_solve_5.5.2.5_dev_osx32/liblpsolve55.a; sourceTree = "<group>"; };
+		AD7143B91F8A1AB400A2C647 /* lp_SOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lp_SOS.h; sourceTree = "<group>"; };
+		AD7143BA1F8A1AB400A2C647 /* lp_mipbb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lp_mipbb.h; sourceTree = "<group>"; };
+		AD7143BB1F8A1AB500A2C647 /* lp_lib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lp_lib.h; sourceTree = "<group>"; };
+		AD7143BC1F8A1AB500A2C647 /* lp_Hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lp_Hash.h; sourceTree = "<group>"; };
+		AD7143BD1F8A1AB500A2C647 /* lp_utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lp_utils.h; sourceTree = "<group>"; };
+		AD7143BE1F8A1AB500A2C647 /* lp_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lp_types.h; sourceTree = "<group>"; };
+		AD7143BF1F8A1AB500A2C647 /* lp_matrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lp_matrix.h; sourceTree = "<group>"; };
+		AD7143C81F8A1D4C00A2C647 /* liblpsolve55.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = liblpsolve55.dylib; path = ../../Downloads/lp_solve_5.5.2.5_dev_osx32/liblpsolve55.dylib; sourceTree = "<group>"; };
 		ADF37F7F1F6EB2C2003C3714 /* Test Point Cloud Project */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Test Point Cloud Project"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADF37F821F6EB2C2003C3714 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -32,17 +58,35 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD7143B81F8A192700A2C647 /* liblpsolve55.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AD71438E1F89007100A2C647 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AD7143B71F8A192700A2C647 /* liblpsolve55.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		ADF37F761F6EB2C2003C3714 = {
 			isa = PBXGroup;
 			children = (
+				AD7143C81F8A1D4C00A2C647 /* liblpsolve55.dylib */,
+				AD7143BC1F8A1AB500A2C647 /* lp_Hash.h */,
+				AD7143BB1F8A1AB500A2C647 /* lp_lib.h */,
+				AD7143BF1F8A1AB500A2C647 /* lp_matrix.h */,
+				AD7143BA1F8A1AB400A2C647 /* lp_mipbb.h */,
+				AD7143B91F8A1AB400A2C647 /* lp_SOS.h */,
+				AD7143BE1F8A1AB500A2C647 /* lp_types.h */,
+				AD7143BD1F8A1AB500A2C647 /* lp_utils.h */,
 				ADF37F811F6EB2C2003C3714 /* Test Point Cloud Project */,
 				ADF37F801F6EB2C2003C3714 /* Products */,
+				AD71438E1F89007100A2C647 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -64,6 +108,23 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		AD7143A11F8902A000A2C647 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD7143C01F8A1AB600A2C647 /* lp_SOS.h in Headers */,
+				AD7143C11F8A1AB600A2C647 /* lp_mipbb.h in Headers */,
+				AD7143C21F8A1AB600A2C647 /* lp_lib.h in Headers */,
+				AD7143C31F8A1AB600A2C647 /* lp_Hash.h in Headers */,
+				AD7143C41F8A1AB600A2C647 /* lp_utils.h in Headers */,
+				AD7143C51F8A1AB600A2C647 /* lp_types.h in Headers */,
+				AD7143C61F8A1AB600A2C647 /* lp_matrix.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		ADF37F7E1F6EB2C2003C3714 /* Test Point Cloud Project */ = {
 			isa = PBXNativeTarget;
@@ -72,6 +133,8 @@
 				ADF37F7B1F6EB2C2003C3714 /* Sources */,
 				ADF37F7C1F6EB2C2003C3714 /* Frameworks */,
 				ADF37F7D1F6EB2C2003C3714 /* CopyFiles */,
+				AD7143A11F8902A000A2C647 /* Headers */,
+				AD7143C71F8A1D0600A2C647 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -219,7 +282,12 @@
 		ADF37F871F6EB2C2003C3714 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DEVELOPMENT_TEAM = 9W57MLZWWT;
+				HEADER_SEARCH_PATHS = /Users/lizhe/Downloads/lp_solve_5.5.2.5_dev_osx32;
+				LIBRARY_SEARCH_PATHS = /Users/lizhe/Downloads/lp_solve_5.5.2.5_dev_osx32;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -227,7 +295,12 @@
 		ADF37F881F6EB2C2003C3714 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DEVELOPMENT_TEAM = 9W57MLZWWT;
+				HEADER_SEARCH_PATHS = /Users/lizhe/Downloads/lp_solve_5.5.2.5_dev_osx32;
+				LIBRARY_SEARCH_PATHS = /Users/lizhe/Downloads/lp_solve_5.5.2.5_dev_osx32;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -251,6 +324,7 @@
 				ADF37F881F6EB2C2003C3714 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
