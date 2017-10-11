@@ -32,6 +32,8 @@ int main(int argc, char* argv[])
     vector<vector<double>> pointclouds3 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test3.pts"); // cube with length 2 in quadrant 1
     vector<vector<double>> pointclouds4 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test4.pts"); // 2D rectangle 2*4
     vector<vector<double>> pointclouds5 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test5.pts"); // 2D rectangle 2*2
+    vector<vector<double>> pointclouds6 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test6.pts"); // 3D Up Centrum 5 points
+    vector<vector<double>> pointclouds7 = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/test7.pts"); // 3D Down Centrum 5 points
     //vector<vector<double>> pointcloudsX = creatPointCloudArrayFromFile("/Users/lizhe/Desktop/pointclouddataset/000020.pts");
 
     printVector(pointclouds1);
@@ -43,6 +45,10 @@ int main(int argc, char* argv[])
     printVector(pointclouds4);
     cout << "========" << endl;
     printVector(pointclouds5);
+    cout << "========" << endl;
+    printVector(pointclouds6);
+    cout << "========" << endl;
+    printVector(pointclouds7);
     cout << "========" << endl;
 
     time_t start,stop;
@@ -183,6 +189,9 @@ REAL mylpsolve(int m ,int n, vector<vector<double>> &pointclouds1, vector<vector
         }
     }
     
+    REAL maxdistance = 0;
+    REAL mindistance = 10000000000000000;
+    
     if (0 == ret) {
         // the colnoXY[0] colnoXY[1] and sparserowXY[2] will be change
         REAL sparserowXY[3] = {1.0,1.0,1.0};
@@ -192,37 +201,56 @@ REAL mylpsolve(int m ,int n, vector<vector<double>> &pointclouds1, vector<vector
         for (int i1 = 0; i1 < m; i1++){
             for (int j1 = 0; j1 < n; j1++){
                 //colnoXY[0] = i1 * n + j1 + 1; // assigne value each time in inner loop or it will be changed by add_constraint
-                for (int i2 = 0; i2 < m; i2++){
-                    for (int j2 = 0; j2 < n; j2++){
-                        // 注意，如果colnoXY[0] 和colnoXY[1] 里面出现同样的,即都是一个yimisi，不会累加，而是取最后一个的值！！！！！！！
-                        if (i1 == i2 && j1 == j2){
+                
+//                for (int i2 = i1; i2 < m; i2++){  // 这样写会漏掉一些！！！ i2 的第二次循环的时候，不是从0开始！！！
+//                    for (int j2 = j1; j2 < n; j2++){ // 这样写会漏掉一些！！！ j2 的第二次循环的时候，不是从0开始！！！
+                
+                for (int temp = i1*n + j1 + 1; temp <= m*n; temp++){
+                    
+                    int i2 = (temp-1) / n;
+                    int j2 = (temp-1) % n;
+                    // 注意，如果colnoXY[0] 和colnoXY[1] 里面出现同样的,即都是一个yimisi，不会累加，而是取最后一个的值！！！！！！！
+                    if (i1 == i2 && j1 == j2){
+                        continue;
+                    } else {
+                        denominator = calculateRotation(i1, i2, j1, j2, pointclouds1, pointclouds2);
+                        if (denominator == 0){
+                            int specialColno[2] {i1*n + j1 + 1, i2*n + j2 + 1};
+                            REAL specialSparserow[2] = {1, 1};
+                            add_constraintex(lp, 2, specialSparserow, specialColno, LE, 2.0);
+                            cout << "=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=" << endl;
                             continue;
-                        } else {
-                            denominator = calculateRotation(i1, i2, j1, j2, pointclouds1, pointclouds2);
-                            if (denominator == 0){
-                                continue;
-                            }
-                            colnoXY[0] = i1*n + j1 + 1;
-                            colnoXY[1] = i2*n + j2 + 1;
-                            colnoXY[2] = m*n+1;
-                            sparserowXY[0] = 1;
-                            sparserowXY[2] = 1;
-                            sparserowXY[2] = -1.0 / denominator;
-                            
-//                            cout << colnoXY[0] << " " << colnoXY[1] << " " << colnoXY[2] << " " << sparserowXY[0] << " " << sparserowXY[1] << " " << sparserowXY[2] << endl;
-                            
-                            // this will change colnoXY !!!!
-                            if (!add_constraintex(lp, 3, sparserowXY, colnoXY, LE, 1.0)) {
-                                ret = 3;
-                                cout << "add constaint fail in step 3" << endl;
-                            }
                         }
-//                        cout << "  after:  " << colnoXY[0] << " " << colnoXY[1] << " " << colnoXY[2] << " " << sparserowXY[0] << " " << sparserowXY[1] << " "<< sparserowXY[2] << endl;
+                        if (denominator > maxdistance){
+                            maxdistance = denominator;
+                        }
+                        if (denominator < mindistance){
+                            mindistance = denominator;
+                        }
+                        colnoXY[0] = i1*n + j1 + 1;
+                        colnoXY[1] = i2*n + j2 + 1;
+                        colnoXY[2] = m*n+1;
+                        sparserowXY[0] = 1;
+                        sparserowXY[2] = 1;
+                        sparserowXY[2] = - (1.0 / denominator);
+                        
+                        cout << colnoXY[0] << " " << colnoXY[1] << " " << colnoXY[2] << " " << sparserowXY[0] << " " << sparserowXY[1] << " " << sparserowXY[2] << endl;
+                        
+                        // this will change colnoXY !!!! So assign them each time
+                        if (!add_constraintex(lp, 3, sparserowXY, colnoXY, LE, 1.0)) {
+                            ret = 3;
+                            cout << "add constaint fail in step 3" << endl;
+                        }
                     }
                 }
+//                    }
+//                }
             }
         }
     }
+    
+    // should I do this????
+    //set_bounds(lp, m*n+1, mindistance, maxdistance);
     
     cout << "===========" << endl;
     
@@ -231,7 +259,6 @@ REAL mylpsolve(int m ,int n, vector<vector<double>> &pointclouds1, vector<vector
     {
         set_add_rowmode(lp, FALSE);
         ret = solve(lp); // will change the coefficient
-        
         cout << "ret: " << ret << endl;
         
         // Objective value.
@@ -250,24 +277,21 @@ REAL mylpsolve(int m ,int n, vector<vector<double>> &pointclouds1, vector<vector
         cout << "===============" << endl;
         cout << "rows: " << get_Nrows(lp) << "   columns: "  << get_Ncolumns(lp) << endl;
         
+        int rows = get_Nrows(lp);
+        int columns = get_Ncolumns(lp);
+        for (int i = 1; i < rows+1; i++){
+            cout << "row " << i << ":  ";
+            REAL temp[columns+1];
+            get_row(lp, i, temp);
+            for (int k = 1; k < columns+1; k++){
+                cout << temp[k] << " ";
+            }
+            cout << endl;
+        }
 //        REAL temp[4113]; // 从1开始，0是objective 所以是列数+1
 //        get_row(lp, 66, temp); // 大于0 的都获取不到
 //        for (int i = 1; i < 66; i++){
 //            cout << temp[i] << endl;
-//        }
-        
-//        REAL temp[4113]; // 从1开始，0是objective 所以是行数+1
-//        get_column(lp, 1, temp); // 大于0 的都获取不到
-//        for (int i = 1; i < 200; i++){
-//            cout << temp[i] << endl;
-//        }
-        
-        // binary check -> OK
-//        cout << "==============" << endl;
-//        bool flag1;
-//        for (int i = 0; i < 65; i++){
-//            flag1 = is_binary(lp, i+1);
-//            cout << "variable" << i+1 << "  binary?  " << flag1 << endl;
 //        }
 
     }
@@ -301,13 +325,51 @@ REAL calculateRotation(const int i, const int j, const int k, const int l, const
 void testLP(){
     lprec* lp;
     lp = make_lp(0, 2);
-    int colno[2] = {1, 1};
-    REAL sparserow[2] = {1.0, 2.0};
-    add_constraintex(lp, 2, sparserow, colno, LE, 5.0);
+//    int colno[2] = {1, 1};
+//    REAL sparserow[2] = {1.0, 2.0};
+//    add_constraintex(lp, 2, sparserow, colno, LE, 5.0);
+    
+    set_binary(lp, 1, TRUE);
+    set_binary(lp, 2, TRUE);
+    
+    set_add_rowmode(lp, TRUE);
+    
+    int colno1[2] = {1, 2};
+    REAL sparserow1[2] = {1.0, 2.0};
+    add_constraintex(lp, 2, sparserow1, colno1, LE, 2.0);
     
     REAL temp[3];
     get_row(lp, 1, temp);
     cout << temp[0] << " " << temp[1] << " " << temp[2] << endl;
+    
+    int colno2[2] = {2, 1};
+    REAL sparserow2[2] = {2.0, 1.0};
+    add_constraintex(lp, 2, sparserow2, colno2, LE, 2.0);
+    
+    int colno3[2] = {2, 1};
+    REAL sparserow3[2] = {2.0, 1.0};
+    add_constraintex(lp, 2, sparserow3, colno3, LE, 2.0);
+    
+    
+    get_row(lp, 1, temp);
+    cout << temp[0] << " " << temp[1] << " " << temp[2] << endl;
+    
+    set_add_rowmode(lp, FALSE);
+    int colno[2] = {1, 2};
+    REAL row[2] = {1, 1};
+    set_obj_fnex(lp, 2, row, colno);
+    set_maxim(lp);
+    int ret = solve(lp);
+    cout << "ret: " << ret << endl;
+    REAL result = get_objective(lp);
+    cout << "result: " << result << endl;
+    REAL * variables = new REAL[2];
+    get_variables(lp, variables);
+    cout << "varables: " <<endl;
+    for (int i = 0; i < 2; i++)
+    {
+        cout << variables[i] <<endl;
+    }
 }
 
 
